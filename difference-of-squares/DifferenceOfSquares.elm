@@ -13,4 +13,4 @@ squareOfSum n =
 
 sumOfSquares : Int -> Int
 sumOfSquares n =
-    List.sum (List.map ((^) 2) (List.range 1 n))
+    List.sum (List.map (\x -> x ^ 2) (List.range 1 n))
