@@ -15,11 +15,4 @@ keep f =
 
 discard : (a -> Bool) -> List a -> List a
 discard f =
-    List.foldr
-        (\x y ->
-            if f x then
-                y
-            else
-                x :: y
-        )
-        []
+    keep (f >> not)
