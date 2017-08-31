@@ -1,6 +1,7 @@
 module RunLengthEncoding exposing (decode, encode, version)
 
 import List exposing (drop, head, length)
+import Regex exposing (regex)
 
 
 version : Int
@@ -8,8 +9,42 @@ version =
     2
 
 
-decode =
-    always
+createDecoding list =
+    case list of
+        x :: y :: rest ->
+            case String.toInt x of
+                Ok num ->
+                    String.repeat num y ++ createDecoding rest
+
+                Err _ ->
+                    x ++ createDecoding (y :: rest)
+
+        x :: rest ->
+            x ++ createDecoding rest
+
+        [] ->
+            ""
+
+
+decode string =
+    string
+        |> Regex.split Regex.All (regex "(\\d+)(\\D)")
+        |> List.filter (\x -> x /= "")
+        |> createDecoding
+
+
+createEncoding x acc =
+    let
+        firstChar =
+            Maybe.withDefault ' ' (head x) |> String.fromChar
+    in
+    acc
+        ++ (if length x == 1 then
+                ""
+            else
+                x |> length |> toString
+           )
+        ++ firstChar
 
 
 encode : String -> String
@@ -19,7 +54,7 @@ encode sequence =
         -- group List items by consecutive letters
         |> groupSequence
         -- Print length of group followed by letter of group
-        |> List.foldl
+        |> List.foldl createEncoding ""
 
 
 groupSequence : List Char -> List (List Char)
